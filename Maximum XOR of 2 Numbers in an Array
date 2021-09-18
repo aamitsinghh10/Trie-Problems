@@ -1,0 +1,102 @@
+class Solution {    
+     struct TrieNode
+    {
+        int val;
+        struct TrieNode *left;
+        struct TrieNode *right;
+        
+        TrieNode()
+        {
+            val=0;
+            left=NULL;
+            right=NULL;
+        }
+    };
+    struct TrieNode *root=new TrieNode();
+public:
+    
+    void insert(int data)
+    {
+        TrieNode *curr=root;
+        int bit;
+        for(int i=31;i>=0;i--)
+        {
+            bit=(data>>i)& 1;
+            
+            if(bit==0)
+            {
+                if(curr->left==NULL)
+                {
+                    curr->left=new TrieNode();
+                }
+                curr=curr->left;
+            }
+            else
+            {
+                if(curr->right==NULL)
+                {
+                    curr->right=new TrieNode();
+                }
+                curr=curr->right;
+            }
+        }
+    }
+    int findMaxXOR(vector<int>& nums)
+    {
+         
+        int n=nums.size();
+        int max_xor=INT_MIN;
+        
+        for(int i=0;i<n;i++)
+        {
+            TrieNode *curr=root;
+            int curr_xor=0;
+            int value=nums[i];
+            
+            for(int j=31;j>=0;j--)
+            {
+                int bit=(value>>j)&1;
+                
+                if(bit==0)
+                {
+                    if(curr->right)
+                    {
+                        curr_xor+=pow(2,j);
+                        curr=curr->right;
+                    }
+                    else
+                    {
+                        curr=curr->left;
+                    }
+                }
+                else
+                {
+                    if(curr->left)
+                    {
+                        curr_xor+=pow(2,j);
+                        curr=curr->left;
+                    }
+                    else
+                    {
+                        curr=curr->right;
+                    }
+                }
+            }
+            if(curr_xor>max_xor)
+              max_xor=curr_xor;
+        }
+        return max_xor;
+    }
+    int findMaximumXOR(vector<int>& nums)
+    {
+       TrieNode* root = new TrieNode();
+        for(int i=0;i<nums.size();i++)
+        {
+            insert(nums[i]);
+        }
+        int res = findMaxXOR(nums);
+        if(res == INT_MIN)
+            return 0;
+        return res;
+    }
+};
