@@ -1,0 +1,78 @@
+class WordDictionary {
+    struct TrieNode
+    {
+        char val;
+        int endshere;
+        TrieNode *child[26];
+    };
+    TrieNode *root;
+    
+    TrieNode *getNode(int index)
+    {
+        TrieNode *newnode=new TrieNode;
+        newnode->val='a'+index;
+        newnode->endshere=0;
+        for(int i=0;i<26;i++)
+        {
+            newnode->child[i]=NULL;
+        }
+        return newnode;
+    }
+public:
+    /** Initialize your data structure here. */
+    WordDictionary() 
+    {
+        root=getNode('/'-'a');
+    }
+    
+    void addWord(string word)
+    {
+        TrieNode *curr=root;
+        int index;
+        for(int i=0;word[i]!='\0';i++)
+        {
+            index=word[i]-'a';
+            if(curr->child[index]==NULL)
+            {
+                curr->child[index]=getNode(index);
+            }
+            curr=curr->child[index];
+        }
+        curr->endshere+=1;
+    }
+    bool trie_search(string s,TrieNode *curr,int pos,int n)
+    {
+        if(s[pos]=='.')
+        {
+            bool res=false;
+            TrieNode *current=curr;
+            
+            for(int i=0;i<26;i++)
+            {
+                if(pos==n-1 && curr->child[i])
+                {
+                    current=curr->child[i];
+                    res=current->endshere>0?true:false;
+                }
+                else if(curr->child[i] && trie_search(s,curr->child[i],pos+1,n))
+                    return true;
+            }
+            return res;
+        }
+        else if(curr->child[s[pos]-'a'])
+        {
+            if(pos==n-1)
+            {
+                curr=curr->child[s[pos]-'a'];
+                return curr->endshere>0?true:false;
+            }
+            return trie_search(s,curr->child[s[pos]-'a'],pos+1,n);
+        }
+        return false;
+    }
+    
+    bool search(string word) 
+    {
+        return trie_search(word,root,0,word.size());
+    }
+};
